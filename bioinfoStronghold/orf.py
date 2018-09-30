@@ -20,16 +20,30 @@ def reverse_complement(dseq):
     return nseq
 
 def translating(dnaseq):
-    rnaseq=reverse_complement(dnaseq.upper()).replace('T','U')
-    aaseq=[]
+    rnaseq=dnaseq.replace('T','U')#
+    rnaseq2=reverse_complement(dnaseq.upper()).replace('T','U')
+    aaseq,aaseq2=[],[]
+    aapos,aapos2=[],[]
     for i in range(len(rnaseq)-2):
+        aapos=[x+1 for x in aapos]
         aa=codon_table[rnaseq[i:i+3]]
         for j in range(len(aaseq)):
-            if 'Stop' not in aaseq[j]:
+            if 'Stop' not in aaseq[j] and aapos[j]%3==1:
                 aaseq[j]+=aa
         if aa=='M':
             aaseq.append(aa)
-    return [x.replace('Stop','') for x in aaseq]
+            aapos.append(1)
+
+        aapos2 = [x + 1 for x in aapos2]
+        aa2 = codon_table[rnaseq2[i:i + 3]]
+        for j in range(len(aaseq2)):
+            if 'Stop' not in aaseq2[j] and aapos2[j] % 3 == 1:
+                aaseq2[j] += aa2
+        if aa2 == 'M':
+            aaseq2.append(aa2)
+            aapos2.append(1)
+    aaout=set(aaseq+aaseq2)
+    return [x.replace('Stop','') for x in aaout if 'Stop' in x]
 
 if __name__=='__main__':
     infile = sys.argv[1]

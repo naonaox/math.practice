@@ -1,23 +1,19 @@
-#Translating RNA into Protein
+#Introduction to Random Strings
 
-import sys
+import sys,math
 
-def stringRead(inpath):
-    with open(inpath) as infile:
-        strs = infile.read().split('\n')
-    return strs
+def common_log_strprob(seq,gc):
+    sequpper=seq.upper()
+    prob=(((1-gc)/2)**(sequpper.count('A')+sequpper.count('T')))*((gc/2)**(sequpper.count('C')+sequpper.count('G')))
+    return math.log10(prob)
 
-codon_table={"UUU":"F","CUU":"L","AUU":"I","GUU":"V","UUC":"F","CUC":"L","AUC":"I","GUC":"V","UUA":"L","CUA":"L","AUA":"I","GUA":"V","UUG":"L","CUG":"L","AUG":"M","GUG":"V","UCU":"S","CCU":"P","ACU":"T","GCU":"A","UCC":"S","CCC":"P","ACC":"T","GCC":"A","UCA":"S","CCA":"P","ACA":"T","GCA":"A","UCG":"S","CCG":"P","ACG":"T","GCG":"A","UAU":"Y","CAU":"H","AAU":"N","GAU":"D","UAC":"Y","CAC":"H","AAC":"N","GAC":"D","UAA":"Stop","CAA":"Q","AAA":"K","GAA":"E","UAG":"Stop","CAG":"Q","AAG":"K","GAG":"E","UGU":"C","CGU":"R","AGU":"S","GGU":"G","UGC":"C","CGC":"R","AGC":"S","GGC":"G","UGA":"Stop","CGA":"R","AGA":"R","GGA":"G","UGG":"W","CGG":"R","AGG":"R","GGG":"G"}
+if __name__=='__main__':
+    infile,outfile=sys.argv[1],sys.argv[2]
+    with open(infile) as rhandle:
+        lines=rhandle.read().split('\n')
+        sequence=lines[0]
+        gcs=[float(x) for x in lines[1].split(' ')]
 
-def translate_RNA(rnaseq):
-    codons=[rnaseq[x:x+3] for x in range(0,len(rnaseq)-3,3)]
-    proteins=[codon_table[x] for x in codons]
-    return ''.join(proteins)
-
-infile=sys.argv[1]
-outfile=sys.argv[2]
-
-rnaseqs=stringRead(infile)
-protein_seq=translate_RNA(rnaseqs[0])
-with open(outfile,'w') as outf:
-    outf.write(protein_seq+'\n')
+    logprobs=[common_log_strprob(sequence,x) for x in gcs]
+    with open(outfile,'w') as whandle:
+        whandle.write(' '.join([str(round(x,6)) for x in logprobs])+'\n')
